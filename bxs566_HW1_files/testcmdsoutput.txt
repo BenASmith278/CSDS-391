@@ -1,0 +1,19 @@
+[0, 1, 2,
+ 3, 4, 5,
+ 6, 7, 8]
+[3, 1, 2,
+ 4, 0, 5,
+ 6, 7, 8]
+[0, 1, 2,
+ 3, 4, 5,
+ 6, 7, 8]
+Error: Invalid move
+Error: Invalid move
+Error: Invalid move
+[1, 4, 2,
+ 3, 5, 8,
+ 6, 0, 7]
+[0, 1, 2,
+ 3, 4, 5,
+ 6, 7, 8]
+Error: invalid command: jimble
