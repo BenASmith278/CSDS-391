@@ -9,6 +9,9 @@ move left
 move up
 # check again
 printState
+# test invalid move
+move up
+printState
 # test scrambling
 scrambleState 10
 printState

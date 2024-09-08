@@ -5,6 +5,13 @@ import java.util.regex.Pattern;
 public class EightPuzzle {
     private List<Integer> state;
 
+    public static void main (String[] args) {
+        EightPuzzle puzzle = new EightPuzzle(new int[]{0, 1, 2, 3, 4, 5, 6, 7, 8});
+        for (String cmdfile : args) {
+            puzzle.cmdfile(cmdfile);
+        }
+    }
+
     public EightPuzzle(int[] state) {
         this.state = new ArrayList<Integer>();
         for (int value : state) {
@@ -18,7 +25,7 @@ public class EightPuzzle {
         } else if (Pattern.matches("^printState$", command)) {
             printState();
         } else if (Pattern.matches("^move (up|down|left|right)$", command)) {
-            move(command.substring(5));
+            if (!(move(command.substring(5)))) System.out.println("Error: invalid move");
         } else if (Pattern.matches("^scrambleState [0-9]+$", command)) {
             scrambleState(Integer.parseInt(command.substring(14)));
         } else if (Pattern.matches("^(#|//).*$", command)) {
@@ -64,49 +71,38 @@ public class EightPuzzle {
                 stateString.substring(0, 9) + "\n" + stateString.substring(9, 18) + "\n" + stateString.substring(18));
     }
 
-    private void move(String direction) {
+    private boolean move(String direction) {
         int zeroIndex = state.indexOf(0);
         int temp;
         switch (direction) {
             case "up":
-                if (zeroIndex - 3 < 0) {
-                    System.out.println("Error: Invalid move");
-                    return;
-                }
+                if (zeroIndex - 3 < 0) return false;
                 temp = state.get(zeroIndex - 3);
                 state.set(zeroIndex, temp);
                 state.set(zeroIndex - 3, 0);
                 break;
             case "down":
-                if (zeroIndex - 5 > 0) {
-                    System.out.println("Error: Invalid move");
-                    return;
-                }
+                if (zeroIndex - 5 > 0) return false;
                 temp = state.get(zeroIndex + 3);
                 state.set(zeroIndex, temp);
                 state.set(zeroIndex + 3, 0);
                 break;
             case "left":
-                if (zeroIndex % 3 == 0) {
-                    System.out.println("Error: Invalid move");
-                    return;
-                }
+                if (zeroIndex % 3 == 0) return false;
                 temp = state.get(zeroIndex - 1);
                 state.set(zeroIndex, temp);
                 state.set(zeroIndex - 1, 0);
                 break;
             case "right":
-                if (zeroIndex % 3 == 2) {
-                    System.out.println("Error: Invalid move");
-                    return;
-                }
+                if (zeroIndex % 3 == 2) return false;
                 temp = state.get(zeroIndex + 1);
                 state.set(zeroIndex, temp);
                 state.set(zeroIndex + 1, 0);
                 break;
             default:
-                System.out.println("Error: Invalid move");
+                return false;
         }
+        return true;
     }
 
     private void scrambleState(int n) {
@@ -116,10 +112,11 @@ public class EightPuzzle {
         moves.put(Integer.parseInt("2"), "left");
         moves.put(Integer.parseInt("3"), "right");
         Random rand = new Random(123456789);
+
+        setState("0 1 2 3 4 5 6 7 8");
         while (n > 0) {
             String move = moves.get(rand.nextInt(4));
-            move(move);
-            n--;
+            if (move(move)) n--;
         }
     }
 }
