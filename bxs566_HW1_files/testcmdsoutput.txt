@@ -1,20 +1,72 @@
+# begin testing
+printState
 [0, 1, 2,
  3, 4, 5,
  6, 7, 8]
+# test all four movement directions
+move down
+move right
+# check halfway and move back
+printState
 [3, 1, 2,
  4, 0, 5,
  6, 7, 8]
+move left
+move up
+# check again
+printState
 [0, 1, 2,
  3, 4, 5,
  6, 7, 8]
+# test invalid move
+move up
 Error: invalid move
+printState
 [0, 1, 2,
  3, 4, 5,
  6, 7, 8]
-[1, 4, 2,
- 3, 0, 8,
- 6, 5, 7]
+# test scrambling
+scrambleState 10
+printState
+[3, 1, 2,
+ 4, 0, 7,
+ 6, 8, 5]
+# test setState
+setState 0 1 2 3 4 5 6 7 8
+printState
 [0, 1, 2,
  3, 4, 5,
  6, 7, 8]
+# test invalid command
+jimble
 Error: invalid command: jimble
+# test BFS
+scrambleState 5
+printState
+[3, 1, 2,
+ 4, 7, 5,
+ 6, 0, 8]
+solve BFS
+Nodes created during search: 71
+Solution length: 3
+Move sequence:
+move up
+move left
+move up
+printState
+[0, 1, 2,
+ 3, 4, 5,
+ 6, 7, 8]
+# test DFS and maxnodes arg
+scrambleState 5
+printState
+[3, 1, 2,
+ 4, 7, 5,
+ 6, 0, 8]
+solve DFS maxnodes=1000000
+Error: maxnodes limit (1000000) reached
+printState
+[3, 1, 2,
+ 4, 7, 5,
+ 6, 0, 8]
+// done (test other comment)
