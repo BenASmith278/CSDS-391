@@ -19,30 +19,37 @@ public class EightPuzzle {
         }
     }
 
-    public void cmd(String command) {
+    public boolean cmd(String command) {
         // there is definitely a way to use a switch case for this
         if (Pattern.matches("^setState ([0-8] ){8}[0-8]$", command)) {
-            setState(command.substring(9));
+            return setState(command.substring(9));
         } else if (Pattern.matches("^printState$", command)) {
             printState();
         } else if (Pattern.matches("^move (up|down|left|right)$", command)) {
-            if (!(move(command.substring(5))))
+            if (!(move(command.substring(5)))) {
                 System.out.println("Error: invalid move");
+                return false;
+            }
+        // move without printing
+        } else if (Pattern.matches("move (up|down|left|right) -q", command)) {
+            return move(command.substring(5, command.length() - 3));
         } else if (Pattern.matches("^scrambleState [0-9]+$", command)) {
             scrambleState(Integer.parseInt(command.substring(14)));
         } else if (Pattern.matches("^(#|//).*$", command)) {
             // do nothing
         } else if (Pattern.matches("^solve DFS$", command)) {
-            solveDFS("1000");
+            return solveDFS("1000");
         } else if (Pattern.matches("^solve DFS maxnodes=[0-9]+$", command)) {
-            solveDFS(command.substring(19));
+            return solveDFS(command.substring(19));
         } else if (Pattern.matches("^solve BFS", command)) {
-            solveBFS("1000");
+            return solveBFS("1000");
         } else if (Pattern.matches("^solve BFS maxnodes=[0-9]+$", command)) {
-            solveBFS(command.substring(19));
+            return solveBFS(command.substring(19));
         } else {
             System.out.println("Error: invalid command: " + command);
         }
+
+        return true;
     }
 
     public void cmdfile(String fileName) {
@@ -60,7 +67,11 @@ public class EightPuzzle {
         }
     }
 
-    private void setState(String state) {
+    public List<Integer> getState() {
+        return puzzleState.stream().map(Integer::valueOf).toList();
+    }
+
+    private boolean setState(String state) {
         String[] values = state.split(" ");
         Set<Integer> uniqueValues = new HashSet<Integer>();
         List<Integer> newState = new ArrayList<Integer>();
@@ -69,11 +80,12 @@ public class EightPuzzle {
             newState.add(val);
             if (!(uniqueValues.add(val))) {
                 System.out.println("Error: invalid puzzle state");
-                return;
+                return false;
             }
         }
 
         this.puzzleState = newState;
+        return true;
     }
 
     private void printState() {
@@ -135,96 +147,66 @@ public class EightPuzzle {
         }
     }
 
-    private void solveBFS(String maxNodes) {
+    private boolean solveBFS(String maxNodes) {
+        if (puzzleState.equals(new ArrayList<Integer>(List.of(0, 1, 2, 3, 4, 5, 6, 7, 8)))) {
+            printSolution(new Node(puzzleState, null, "start"), 0);
+            return true;
+        }
         int nodesCreated = 0;
         int maxNodesInt = Integer.parseInt(maxNodes);
         Queue<Node> frontier = new LinkedList<>();
+        Set<String> reached = new HashSet<String>();
         frontier.add(new Node(puzzleState, null, "start"));
+        reached.add(puzzleState.toString());
 
-        while (nodesCreated < maxNodesInt) {
-            Node currentNode = frontier.poll();
-            String currentState = currentNode.getState();
-            setState(currentState); // set the puzzle state to the node being evaluated
-
-            if (currentState.equals("0 1 2 3 4 5 6 7 8")) {
-                printSolution(currentNode, nodesCreated);
-                return;
-            }
-
-            // prof liberatore would shoot me if he saw this
-            if (move("left")) {
-                frontier.add(new Node(new ArrayList<>(puzzleState), currentNode, "move left"));
-                move("right");
-                nodesCreated++;
-            }
-
-            if (move("right")) {
-                frontier.add(new Node(new ArrayList<>(puzzleState), currentNode, "move right"));
-                move("left");
-                nodesCreated++;
-            }
-
-            if (move("up")) {
-                frontier.add(new Node(new ArrayList<>(puzzleState), currentNode, "move up"));
-                move("down");
-                nodesCreated++;
-            }
-
-            if (move("down")) {
-                frontier.add(new Node(new ArrayList<>(puzzleState), currentNode, "move down"));
-                move("up");
-                nodesCreated++;
+        while (nodesCreated < maxNodesInt && frontier.size() > 0) {
+            for (Node child : frontier.poll().expand(this)) {
+                String childState = child.getState();
+                if (childState.equals("0 1 2 3 4 5 6 7 8")) {
+                    setState(childState);
+                    printSolution(child, nodesCreated);
+                    return true;
+                }
+                if (reached.add(childState)) {
+                    frontier.add(child);
+                    nodesCreated++;
+                }
             }
         }
 
         System.out.println("Error: maxnodes limit (" + maxNodes + ") reached");
-        return;
+        return false;
     }
 
-    private void solveDFS(String maxNodes) {
+    private boolean solveDFS(String maxNodes) {
+        if (puzzleState.equals(new ArrayList<Integer>(List.of(0, 1, 2, 3, 4, 5, 6, 7, 8)))) {
+            printSolution(new Node(puzzleState, null, "start"), 0);
+            return true;
+        }
         int nodesCreated = 0;
         int maxNodesInt = Integer.parseInt(maxNodes);
         Stack<Node> frontier = new Stack<>();
-        frontier.add(new Node(puzzleState, null, "start"));
+        Set<String> reached = new HashSet<String>();
+        frontier.push(new Node(puzzleState, null, "start"));
+        reached.add(puzzleState.toString());
 
-        while (nodesCreated < maxNodesInt) {
-            Node currentNode = frontier.pop();
-            String currentState = currentNode.getState();
-            setState(currentState); // set the puzzle state to the node being evaluated
-
-            if (currentState.equals("0 1 2 3 4 5 6 7 8")) {
-                printSolution(currentNode, nodesCreated);
-                return;
-            }
-
-            // prof liberatore would shoot me if he saw this
-            if (move("left")) {
-                frontier.push(new Node(new ArrayList<>(puzzleState), currentNode, "move left"));
-                move("right");
-                nodesCreated++;
-            }
-
-            if (move("right")) {
-                frontier.push(new Node(new ArrayList<>(puzzleState), currentNode, "move right"));
-                move("left");
-                nodesCreated++;
-            }
-
-            if (move("up")) {
-                frontier.push(new Node(new ArrayList<>(puzzleState), currentNode, "move up"));
-                move("down");
-                nodesCreated++;
-            }
-
-            if (move("down")) {
-                frontier.push(new Node(new ArrayList<>(puzzleState), currentNode, "move down"));
-                move("up");
-                nodesCreated++;
+        while (nodesCreated < maxNodesInt && !(frontier.empty())) {
+            for (Node child : frontier.pop().expand(this)) {
+                String childState = child.getState();
+                if (childState.equals("0 1 2 3 4 5 6 7 8")) {
+                    setState(childState);
+                    printSolution(child, nodesCreated);
+                    return true;
+                }
+                if (reached.add(childState)) {
+                    frontier.push(child);
+                    nodesCreated++;
+                }
             }
         }
 
         System.out.println("Error: maxnodes limit (" + maxNodes + ") reached");
-        return;
+        return false;
     }
 
     private void printSolution(Node currentNode, int nodesCreated) {

@@ -22,4 +22,31 @@ public class Node {
     public String getMove() {
         return move;
     }
+
+    public List<Node> expand(EightPuzzle puzzle) {
+        List<Node> children = new ArrayList<>();
+        puzzle.cmd("setState " + getState());
+
+        if (puzzle.cmd("move left -q")) {
+            children.add(new Node(new ArrayList<>(puzzle.getState()), this, "move left"));
+            puzzle.cmd("move right");
+        }
+
+        if (puzzle.cmd("move right -q")) {
+            children.add(new Node(new ArrayList<>(puzzle.getState()), this, "move right"));
+            puzzle.cmd("move left");
+        }
+
+        if (puzzle.cmd("move up -q")) {
+            children.add(new Node(new ArrayList<>(puzzle.getState()), this, "move up"));
+            puzzle.cmd("move down");
+        }
+
+        if (puzzle.cmd("move down -q")) {
+            children.add(new Node(new ArrayList<>(puzzle.getState()), this, "move down"));
+            puzzle.cmd("move up");
+        }
+
+        return children;
+    }
 }
