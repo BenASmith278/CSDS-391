@@ -34,14 +34,15 @@ printState
 # test DFS and maxnodes arg
 scrambleState 5
 printState
-# estimate number of moves
-heuristic h1
-heuristic h2
 solve DFS maxnodes=10000
-printState
 # compare heuristics
-scrambleState 100
+scrambleState 10
 printState
 heuristic h1
 heuristic h2
+# compare heuristic estimate to reality
+solve A* h1
+# reset to last scrambled state
+scrambleState 10
+solve A* h2
 // done (test other comment)
