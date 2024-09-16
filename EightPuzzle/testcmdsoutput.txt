@@ -3,6 +3,11 @@ printState
 [0, 1, 2,
  3, 4, 5,
  6, 7, 8]
+# check heuristics are 0 for solved state
+heuristic h1
+0
+heuristic h2
+0
 # test all four movement directions
 move down
 move right
@@ -46,8 +51,13 @@ printState
 [3, 1, 2,
  4, 7, 5,
  6, 0, 8]
+# estimate number of moves
+heuristic h1
+3
+heuristic h2
+3
 solve BFS
-Nodes created during search: 71
+Nodes created during search: 13
 Solution length: 3
 Move sequence:
 move up
@@ -63,10 +73,43 @@ printState
 [3, 1, 2,
  4, 7, 5,
  6, 0, 8]
-solve DFS maxnodes=1000000
-Error: maxnodes limit (1000000) reached
+solve DFS maxnodes=10000
+Error: maxnodes limit (10000) reached
+# compare heuristics
+scrambleState 10
 printState
 [3, 1, 2,
- 4, 7, 5,
- 6, 0, 8]
+ 4, 0, 7,
+ 6, 8, 5]
+heuristic h1
+5
+heuristic h2
+6
+# compare heuristic estimate to reality
+solve A* h1
+Nodes created during search: 27
+Solution length: 10
+Move sequence:
+move left
+move up
+move right
+move down
+move right
+move down
+move left
+move up
+move up
+move left
+# reset to last scrambled state
+scrambleState 10
+solve A* h2
+Nodes created during search: 16
+Solution length: 6
+Move sequence:
+move right
+move down
+move left
+move up
+move left
+move up
 // done (test other comment)

@@ -45,6 +45,10 @@ public class EightPuzzle {
             return solveBFS("1000");
         } else if (Pattern.matches("^solve BFS maxnodes=[0-9]+$", command)) {
             return solveBFS(command.substring(19));
+        } else if (Pattern.matches("^solve A\\* (h1|h2)$", command)) {
+            return aStar("1000", command.substring(9));
+        } else if (Pattern.matches("^solve A\\* (h1|h2) maxnodes=[0-9]+$", command)) {
+            return aStar(command.substring(21), command.substring(9));
         } else if (Pattern.matches("^heuristic (h1|h2)$", command)) {
             System.out.println("" + heuristic(new Node(puzzleState, null, ""), command.substring(10)));
         } else {
@@ -228,39 +232,44 @@ public class EightPuzzle {
     private int heuristic(Node node, String heuristic) {
         switch (heuristic) {
             case "h1":
-                return heuristicH1(node);
+                return new Node(puzzleState, null, "").heuristicH1();
             case "h2":
-                return heuristicH2(node);
+                return new Node(puzzleState, null, "").heuristicH2();
             default:
                 break;
         }
         return 0;
     }
 
-    private int heuristicH1(Node node) {
-        List<Integer> state = node.getState();
-        int misplacedTiles = 0;
-        for (int i = 1; i < 9; i++) {
-            if (state.get(i) != i) {
-                misplacedTiles++;
-            }
-        }
-        return misplacedTiles;
-    }
-
-    private int heuristicH2(Node node) {
-        List<Integer> state = node.getState();
-        int totalDistance = 0;
-        for (int i = 1; i < 9; i++) {
-            int tileIndex = state.indexOf(i);
-            // manhattan distance
-            totalDistance = totalDistance + Math.abs((tileIndex % 3) - (i % 3)) + Math.abs((tileIndex / 3) - (i / 3));
-        }
-        return totalDistance;
-    }
-
     private boolean aStar(String maxNodes, String heuristic) {
         // BFS priority queue with heuristic
+        if (puzzleState.equals(new ArrayList<Integer>(List.of(0, 1, 2, 3, 4, 5, 6, 7, 8)))) {
+            printSolution(new Node(puzzleState, null, "start"), 0);
+            return true;
+        }
+        int nodesCreated = 0;
+        int maxNodesInt = Integer.parseInt(maxNodes);
+        PriorityQueue<Node> frontier = new PriorityQueue<>(Node::compareTo);
+        Set<String> reached = new HashSet<String>();
+        frontier.add(new Node(puzzleState, null, "start", heuristic));
+        reached.add(puzzleState.toString());
+
+        while (nodesCreated < maxNodesInt && frontier.size() > 0) {
+            for (Node child : frontier.poll().expand(this)) {
+                String childState = child.getStateString();
+                if (childState.equals("0 1 2 3 4 5 6 7 8")) {
+                    setState(childState);
+                    printSolution(child, nodesCreated);
+                    return true;
+                }
+                if (reached.add(childState)) {
+                    frontier.add(child);
+                    nodesCreated++;
+                }
+            }
+        }
+
+        System.out.println("Error: maxnodes limit (" + maxNodes + ") reached");
         return false;
     }
 }
