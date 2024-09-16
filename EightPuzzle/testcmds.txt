@@ -1,5 +1,8 @@
 # begin testing
 printState
+# check heuristics are 0 for solved state
+heuristic h1
+heuristic h2
 # test all four movement directions
 move down
 move right
@@ -23,11 +26,22 @@ jimble
 # test BFS
 scrambleState 5
 printState
+# estimate number of moves
+heuristic h1
+heuristic h2
 solve BFS
 printState
 # test DFS and maxnodes arg
 scrambleState 5
 printState
-solve DFS maxnodes=1000000
+# estimate number of moves
+heuristic h1
+heuristic h2
+solve DFS maxnodes=10000
 printState
+# compare heuristics
+scrambleState 100
+printState
+heuristic h1
+heuristic h2
 // done (test other comment)

@@ -11,7 +11,11 @@ public class Node {
         this.move = move;
     }
 
-    public String getState() {
+    public List<Integer> getState() {
+        return state.stream().map(Integer::valueOf).toList();
+    }
+
+    public String getStateString() {
         return state.toString().replace("[", "").replace("]", "").replace(",", "");
     }
 
@@ -25,7 +29,7 @@ public class Node {
 
     public List<Node> expand(EightPuzzle puzzle) {
         List<Node> children = new ArrayList<>();
-        puzzle.cmd("setState " + getState());
+        puzzle.cmd("setState " + getStateString());
 
         if (puzzle.cmd("move left -q")) {
             children.add(new Node(new ArrayList<>(puzzle.getState()), this, "move left"));

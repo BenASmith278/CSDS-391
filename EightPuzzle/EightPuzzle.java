@@ -30,7 +30,7 @@ public class EightPuzzle {
                 System.out.println("Error: invalid move");
                 return false;
             }
-        // move without printing
+            // move without printing
         } else if (Pattern.matches("move (up|down|left|right) -q", command)) {
             return move(command.substring(5, command.length() - 3));
         } else if (Pattern.matches("^scrambleState [0-9]+$", command)) {
@@ -45,6 +45,8 @@ public class EightPuzzle {
             return solveBFS("1000");
         } else if (Pattern.matches("^solve BFS maxnodes=[0-9]+$", command)) {
             return solveBFS(command.substring(19));
+        } else if (Pattern.matches("^heuristic (h1|h2)$", command)) {
+            System.out.println("" + heuristic(new Node(puzzleState, null, ""), command.substring(10)));
         } else {
             System.out.println("Error: invalid command: " + command);
         }
@@ -161,7 +163,7 @@ public class EightPuzzle {
 
         while (nodesCreated < maxNodesInt && frontier.size() > 0) {
             for (Node child : frontier.poll().expand(this)) {
-                String childState = child.getState();
+                String childState = child.getStateString();
                 if (childState.equals("0 1 2 3 4 5 6 7 8")) {
                     setState(childState);
                     printSolution(child, nodesCreated);
@@ -192,7 +194,7 @@ public class EightPuzzle {
 
         while (nodesCreated < maxNodesInt && !(frontier.empty())) {
             for (Node child : frontier.pop().expand(this)) {
-                String childState = child.getState();
+                String childState = child.getStateString();
                 if (childState.equals("0 1 2 3 4 5 6 7 8")) {
                     setState(childState);
                     printSolution(child, nodesCreated);
@@ -221,5 +223,44 @@ public class EightPuzzle {
         while (!(moves.isEmpty())) {
             System.out.println(moves.pop());
         }
+    }
+
+    private int heuristic(Node node, String heuristic) {
+        switch (heuristic) {
+            case "h1":
+                return heuristicH1(node);
+            case "h2":
+                return heuristicH2(node);
+            default:
+                break;
+        }
+        return 0;
+    }
+
+    private int heuristicH1(Node node) {
+        List<Integer> state = node.getState();
+        int misplacedTiles = 0;
+        for (int i = 1; i < 9; i++) {
+            if (state.get(i) != i) {
+                misplacedTiles++;
+            }
+        }
+        return misplacedTiles;
+    }
+
+    private int heuristicH2(Node node) {
+        List<Integer> state = node.getState();
+        int totalDistance = 0;
+        for (int i = 1; i < 9; i++) {
+            int tileIndex = state.indexOf(i);
+            // manhattan distance
+            totalDistance = totalDistance + Math.abs((tileIndex % 3) - (i % 3)) + Math.abs((tileIndex / 3) - (i / 3));
+        }
+        return totalDistance;
+    }
+
+    private boolean aStar(String maxNodes, String heuristic) {
+        // BFS priority queue with heuristic
+        return false;
     }
 }
