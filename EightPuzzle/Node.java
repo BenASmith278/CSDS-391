@@ -1,19 +1,33 @@
 import java.util.*;
 
 public class Node implements Comparable<Node> {
-    List<Integer> state;
-    Node parent;
-    String move;
-    String heuristic;
+    private List<Integer> state;
+    private Node parent;
+    private Moves move;
+    private String heuristic;
 
-    public Node(List<Integer> state, Node parent, String move) {
+    public enum Moves {
+        LEFT,
+        RIGHT,
+        UP,
+        DOWN
+    }
+
+    public Node(List<Integer> state) {
+        this.state = state;
+        this.parent = null;
+        this.move = null;
+        this.heuristic = "";
+    }
+
+    public Node(List<Integer> state, Node parent, Moves move) {
         this.state = state;
         this.parent = parent;
         this.move = move;
         this.heuristic = "";
     }
 
-    public Node(List<Integer> state, Node parent, String move, String heuristic) {
+    public Node(List<Integer> state, Node parent, Moves move, String heuristic) {
         this.state = state;
         this.parent = parent;
         this.move = move;
@@ -21,16 +35,20 @@ public class Node implements Comparable<Node> {
     }
 
     public int compareTo(Node node) {
+        int n;
         switch (heuristic) {
             case "h1":
-                return Integer.valueOf(this.heuristicH1()).compareTo(Integer.valueOf(node.heuristicH1()));
-            case "h2":
-                return Integer.valueOf(this.heuristicH2()).compareTo(Integer.valueOf(node.heuristicH2()));
-            default:
+                n = Integer.valueOf(this.heuristicH1()).compareTo(Integer.valueOf(node.heuristicH1()));
                 break;
+            case "h2":
+                n = Integer.valueOf(this.heuristicH2()).compareTo(Integer.valueOf(node.heuristicH2()));
+                break;
+            default: // no heuristic
+                n = 0;
         }
-        
-        return 0;
+        if (n == 0)
+            n = this.move.compareTo(node.move);
+        return n;
     }
 
     public List<Integer> getState() {
@@ -46,7 +64,24 @@ public class Node implements Comparable<Node> {
     }
 
     public String getMove() {
-        return move;
+        String moveString;
+        switch (move) {
+            case Moves.LEFT:
+                moveString = "move left";
+                break;
+            case Moves.RIGHT:
+                moveString = "move right";
+                break;
+            case Moves.UP:
+                moveString = "move up";
+                break;
+            case Moves.DOWN:
+                moveString = "move down";
+                break;
+            default:
+                moveString = "none";
+        }
+        return moveString;
     }
 
     public List<Node> expand(EightPuzzle puzzle) {
@@ -54,22 +89,22 @@ public class Node implements Comparable<Node> {
         puzzle.cmd("setState " + getStateString());
 
         if (puzzle.cmd("move left -q")) {
-            children.add(new Node(new ArrayList<>(puzzle.getState()), this, "move left", this.heuristic));
+            children.add(new Node(new ArrayList<>(puzzle.getState()), this, Moves.LEFT, this.heuristic));
             puzzle.cmd("move right");
         }
 
         if (puzzle.cmd("move right -q")) {
-            children.add(new Node(new ArrayList<>(puzzle.getState()), this, "move right", this.heuristic));
+            children.add(new Node(new ArrayList<>(puzzle.getState()), this, Moves.RIGHT, this.heuristic));
             puzzle.cmd("move left");
         }
 
         if (puzzle.cmd("move up -q")) {
-            children.add(new Node(new ArrayList<>(puzzle.getState()), this, "move up", this.heuristic));
+            children.add(new Node(new ArrayList<>(puzzle.getState()), this, Moves.UP, this.heuristic));
             puzzle.cmd("move down");
         }
 
         if (puzzle.cmd("move down -q")) {
-            children.add(new Node(new ArrayList<>(puzzle.getState()), this, "move down", this.heuristic));
+            children.add(new Node(new ArrayList<>(puzzle.getState()), this, Moves.DOWN, this.heuristic));
             puzzle.cmd("move up");
         }
 

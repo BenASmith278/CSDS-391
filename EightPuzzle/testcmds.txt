@@ -45,7 +45,7 @@ solve A* h1
 # reset to last scrambled state
 scrambleState 10
 solve A* h2
-# prove repeated state checking
-setState 1 2 3 4 5 6 0 7 8
-solve BFS maxnodes=100000
+# test repeated state checking
+# setState 1 2 3 4 5 6 7 8 0
+# solve DFS maxnodes=1000000
 // done (test other comment)

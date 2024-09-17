@@ -50,7 +50,7 @@ public class EightPuzzle {
         } else if (Pattern.matches("^solve A\\* (h1|h2) maxnodes=[0-9]+$", command)) {
             return solveAStar(command.substring(21), command.substring(9));
         } else if (Pattern.matches("^heuristic (h1|h2)$", command)) {
-            System.out.println("" + heuristic(new Node(puzzleState, null, ""), command.substring(10)));
+            System.out.println("" + heuristic(new Node(puzzleState), command.substring(10)));
         } else {
             System.out.println("Error: invalid command: " + command);
         }
@@ -155,14 +155,14 @@ public class EightPuzzle {
 
     private boolean solveBFS(String maxNodes) {
         if (puzzleState.equals(new ArrayList<Integer>(List.of(0, 1, 2, 3, 4, 5, 6, 7, 8)))) {
-            printSolution(new Node(puzzleState, null, "start"), 0);
+            printSolution(new Node(puzzleState), 0);
             return true;
         }
         int nodesCreated = 0;
         int maxNodesInt = Integer.parseInt(maxNodes);
         Queue<Node> frontier = new LinkedList<>();
         Set<String> reached = new HashSet<String>();
-        frontier.add(new Node(puzzleState, null, "start"));
+        frontier.add(new Node(puzzleState));
         reached.add(puzzleState.toString());
 
         while (nodesCreated < maxNodesInt && frontier.size() > 0) {
@@ -186,14 +186,14 @@ public class EightPuzzle {
 
     private boolean solveDFS(String maxNodes) {
         if (puzzleState.equals(new ArrayList<Integer>(List.of(0, 1, 2, 3, 4, 5, 6, 7, 8)))) {
-            printSolution(new Node(puzzleState, null, "start"), 0);
+            printSolution(new Node(puzzleState), 0);
             return true;
         }
         int nodesCreated = 0;
         int maxNodesInt = Integer.parseInt(maxNodes);
         Stack<Node> frontier = new Stack<>();
         Set<String> reached = new HashSet<String>();
-        frontier.push(new Node(puzzleState, null, "start"));
+        frontier.push(new Node(puzzleState));
         reached.add(puzzleState.toString());
 
         while (nodesCreated < maxNodesInt && !(frontier.empty())) {
@@ -232,9 +232,9 @@ public class EightPuzzle {
     private int heuristic(Node node, String heuristic) {
         switch (heuristic) {
             case "h1":
-                return new Node(puzzleState, null, "").heuristicH1();
+                return new Node(puzzleState).heuristicH1();
             case "h2":
-                return new Node(puzzleState, null, "").heuristicH2();
+                return new Node(puzzleState).heuristicH2();
             default:
                 break;
         }
@@ -244,14 +244,14 @@ public class EightPuzzle {
     private boolean solveAStar(String maxNodes, String heuristic) {
         // BFS priority queue with heuristic
         if (puzzleState.equals(new ArrayList<Integer>(List.of(0, 1, 2, 3, 4, 5, 6, 7, 8)))) {
-            printSolution(new Node(puzzleState, null, "start"), 0);
+            printSolution(new Node(puzzleState), 0);
             return true;
         }
         int nodesCreated = 0;
         int maxNodesInt = Integer.parseInt(maxNodes);
         PriorityQueue<Node> frontier = new PriorityQueue<>(Node::compareTo);
         Set<String> reached = new HashSet<String>();
-        frontier.add(new Node(puzzleState, null, "start", heuristic));
+        frontier.add(new Node(puzzleState, null, null, heuristic));
         reached.add(puzzleState.toString());
 
         while (nodesCreated < maxNodesInt && frontier.size() > 0) {
