@@ -87,7 +87,7 @@ heuristic h2
 6
 # compare heuristic estimate to reality
 solve A* h1
-Nodes created during search: 18
+Nodes created during search: 27
 Solution length: 6
 Move sequence:
 move right
@@ -96,10 +96,10 @@ move left
 move up
 move left
 move up
-# reset to last scrambled state
+# reset to last scrambled state to compare heuristic solution lengths
 scrambleState 10
 solve A* h2
-Nodes created during search: 16
+Nodes created during search: 24
 Solution length: 6
 Move sequence:
 move right

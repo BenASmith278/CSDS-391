@@ -1,3 +1,5 @@
+package EightPuzzle;
+
 import java.io.File;
 import java.util.*;
 import java.util.regex.Pattern;
@@ -70,6 +72,7 @@ public class EightPuzzle {
             scanner.close();
         } catch (Exception e) {
             System.out.println("Error: invalid file: " + fileName);
+            System.out.println(e);
         }
     }
 
@@ -216,16 +219,26 @@ public class EightPuzzle {
     }
 
     private void printSolution(Node currentNode, int nodesCreated) {
-        Stack<String> moves = new Stack<>();
-        while (currentNode.getParent() != null) {
-            moves.push(currentNode.getMove());
-            currentNode = currentNode.getParent();
-        }
         System.out.println("Nodes created during search: " + nodesCreated);
-        System.out.println("Solution length: " + moves.size());
+        System.out.println("Solution length: " + currentNode.getPathCost());
         System.out.println("Move sequence:");
-        while (!(moves.isEmpty())) {
-            System.out.println(moves.pop());
+        for (Node.Moves move : currentNode.getMoves()) {
+            switch (move) {
+                case Node.Moves.UP:
+                    System.out.println("move up");
+                    break;
+                case Node.Moves.DOWN:
+                    System.out.println("move down");
+                    break;
+                case Node.Moves.LEFT:
+                    System.out.println("move left");
+                    break;
+                case Node.Moves.RIGHT:
+                    System.out.println("move right");
+                    break;
+                default:
+                    System.out.println("no move");
+            }
         }
     }
 
@@ -243,28 +256,34 @@ public class EightPuzzle {
 
     private boolean solveAStar(String maxNodes, String heuristic) {
         // BFS priority queue with heuristic
-        if (puzzleState.equals(new ArrayList<Integer>(List.of(0, 1, 2, 3, 4, 5, 6, 7, 8)))) {
-            printSolution(new Node(puzzleState), 0);
-            return true;
-        }
         int nodesCreated = 0;
         int maxNodesInt = Integer.parseInt(maxNodes);
         PriorityQueue<Node> frontier = new PriorityQueue<>(Node::compareTo);
-        Set<String> reached = new HashSet<String>();
-        frontier.add(new Node(puzzleState, null, null, heuristic));
-        reached.add(puzzleState.toString());
+        Set<Node> reached = new HashSet<Node>();
+        Node currentNode = new Node(puzzleState, null, null, heuristic);
+        frontier.add(currentNode);
+        reached.add(currentNode);
 
         while (nodesCreated < maxNodesInt && frontier.size() > 0) {
-            for (Node child : frontier.poll().expand(this)) {
-                String childState = child.getStateString();
-                if (childState.equals("0 1 2 3 4 5 6 7 8")) {
-                    setState(childState);
-                    printSolution(child, nodesCreated);
-                    return true;
-                }
-                if (reached.add(childState)) {
+            currentNode = frontier.poll();
+            if (currentNode.getStateString().equals("0 1 2 3 4 5 6 7 8")) {
+                setState(currentNode.getStateString());
+                printSolution(currentNode, nodesCreated);
+                return true;
+            }
+
+            for (Node child : currentNode.expand(this)) {
+                if (reached.add(child)) {
                     frontier.add(child);
                     nodesCreated++;
+                } else if (frontier.contains(child)) {
+                    for (Node node : frontier) {
+                        if (node.equals(child) && child.getPathCost() < node.getPathCost()) {
+                            frontier.remove(node);
+                            frontier.add(child);
+                            break;
+                        }
+                    }
                 }
             }
         }

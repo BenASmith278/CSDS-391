@@ -1,53 +1,63 @@
+package EightPuzzle;
+
 import java.util.*;
 
 public class Node implements Comparable<Node> {
     private List<Integer> state;
-    private Node parent;
-    private Moves move;
+    private List<Moves> moves;
     private String heuristic;
 
     public enum Moves {
         LEFT,
         RIGHT,
         UP,
-        DOWN
+        DOWN,
+        START
     }
 
     public Node(List<Integer> state) {
         this.state = state;
-        this.parent = null;
-        this.move = null;
+        this.moves = new ArrayList<>();
         this.heuristic = "";
     }
 
     public Node(List<Integer> state, Node parent, Moves move) {
         this.state = state;
-        this.parent = parent;
-        this.move = move;
         this.heuristic = "";
+        if (parent != null) {
+            this.moves = parent.getMoves();
+            this.moves.add(move);
+        } else {
+            this.moves = new ArrayList<>();
+        }
     }
 
     public Node(List<Integer> state, Node parent, Moves move, String heuristic) {
         this.state = state;
-        this.parent = parent;
-        this.move = move;
         this.heuristic = heuristic;
+        if (parent != null) {
+            this.moves = parent.getMoves();
+            this.moves.add(move);
+        } else {
+            this.moves = new ArrayList<>();
+        }
     }
 
     public int compareTo(Node node) {
         int n;
+        // calculate g(n) + h(n)
         switch (heuristic) {
             case "h1":
-                n = Integer.valueOf(this.heuristicH1()).compareTo(Integer.valueOf(node.heuristicH1()));
+                n = Integer.valueOf(this.heuristicH1() + this.getPathCost()).compareTo(Integer.valueOf(node.heuristicH1() + node.getPathCost()));
                 break;
             case "h2":
-                n = Integer.valueOf(this.heuristicH2()).compareTo(Integer.valueOf(node.heuristicH2()));
+                n = Integer.valueOf(this.heuristicH2() + this.getPathCost()).compareTo(Integer.valueOf(node.heuristicH2() + node.getPathCost()));
                 break;
             default: // no heuristic
                 n = 0;
         }
         if (n == 0)
-            n = this.move.compareTo(node.move);
+            n = this.moves.getLast().compareTo(node.moves.getLast());
         return n;
     }
 
@@ -59,29 +69,12 @@ public class Node implements Comparable<Node> {
         return state.toString().replace("[", "").replace("]", "").replace(",", "");
     }
 
-    public Node getParent() {
-        return parent;
+    public List<Moves> getMoves() {
+        return new ArrayList<>(moves);
     }
 
-    public String getMove() {
-        String moveString;
-        switch (move) {
-            case Moves.LEFT:
-                moveString = "move left";
-                break;
-            case Moves.RIGHT:
-                moveString = "move right";
-                break;
-            case Moves.UP:
-                moveString = "move up";
-                break;
-            case Moves.DOWN:
-                moveString = "move down";
-                break;
-            default:
-                moveString = "none";
-        }
-        return moveString;
+    public int getPathCost() {
+        return this.moves.size();
     }
 
     public List<Node> expand(EightPuzzle puzzle) {
@@ -114,7 +107,7 @@ public class Node implements Comparable<Node> {
     public int heuristicH1() {
         int misplacedTiles = 0;
         for (int i = 1; i < 9; i++) {
-            if (state.get(i) != i) {
+            if (state.indexOf(i) != i) {
                 misplacedTiles++;
             }
         }
@@ -129,5 +122,15 @@ public class Node implements Comparable<Node> {
             totalDistance = totalDistance + Math.abs((tileIndex % 3) - (i % 3)) + Math.abs((tileIndex / 3) - (i / 3));
         }
         return totalDistance;
+    }
+
+    @Override
+    public boolean equals(Object e) {
+        Objects.requireNonNull(e);
+        if (e.getClass() != this.getClass())
+            return false;
+        else if (((Node) e).getStateString().equals(this.getStateString()))
+            return true;
+        return false;
     }
 }
