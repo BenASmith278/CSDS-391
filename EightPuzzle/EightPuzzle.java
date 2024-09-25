@@ -156,6 +156,30 @@ public class EightPuzzle {
         }
     }
 
+    private void printSolution(Node currentNode, int nodesCreated) {
+        System.out.println("Nodes created during search: " + nodesCreated);
+        System.out.println("Solution length: " + currentNode.getPathCost());
+        System.out.println("Move sequence:");
+        for (Node.Moves move : currentNode.getMoves()) {
+            switch (move) {
+                case Node.Moves.UP:
+                    System.out.println("move up");
+                    break;
+                case Node.Moves.DOWN:
+                    System.out.println("move down");
+                    break;
+                case Node.Moves.LEFT:
+                    System.out.println("move left");
+                    break;
+                case Node.Moves.RIGHT:
+                    System.out.println("move right");
+                    break;
+                default:
+                    System.out.println("no move");
+            }
+        }
+    }
+
     private boolean solveBFS(String maxNodes) {
         if (puzzleState.equals(new ArrayList<Integer>(List.of(0, 1, 2, 3, 4, 5, 6, 7, 8)))) {
             printSolution(new Node(puzzleState), 0);
@@ -218,30 +242,6 @@ public class EightPuzzle {
         return false;
     }
 
-    private void printSolution(Node currentNode, int nodesCreated) {
-        System.out.println("Nodes created during search: " + nodesCreated);
-        System.out.println("Solution length: " + currentNode.getPathCost());
-        System.out.println("Move sequence:");
-        for (Node.Moves move : currentNode.getMoves()) {
-            switch (move) {
-                case Node.Moves.UP:
-                    System.out.println("move up");
-                    break;
-                case Node.Moves.DOWN:
-                    System.out.println("move down");
-                    break;
-                case Node.Moves.LEFT:
-                    System.out.println("move left");
-                    break;
-                case Node.Moves.RIGHT:
-                    System.out.println("move right");
-                    break;
-                default:
-                    System.out.println("no move");
-            }
-        }
-    }
-
     private int heuristic(Node node, String heuristic) {
         switch (heuristic) {
             case "h1":
@@ -278,7 +278,9 @@ public class EightPuzzle {
                     nodesCreated++;
                 } else if (frontier.contains(child)) {
                     for (Node node : frontier) {
-                        if (node.equals(child) && child.getPathCost() < node.getPathCost()) {
+                        // update entry in frontier if a cheaper path is found
+                        if (node.equals(child) && (child.getPathCost()
+                                + heuristic(child, heuristic)) < (node.getPathCost() + heuristic(node, heuristic))) {
                             frontier.remove(node);
                             frontier.add(child);
                             break;

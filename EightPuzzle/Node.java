@@ -11,8 +11,7 @@ public class Node implements Comparable<Node> {
         LEFT,
         RIGHT,
         UP,
-        DOWN,
-        START
+        DOWN
     }
 
     public Node(List<Integer> state) {
@@ -48,10 +47,12 @@ public class Node implements Comparable<Node> {
         // calculate g(n) + h(n)
         switch (heuristic) {
             case "h1":
-                n = Integer.valueOf(this.heuristicH1() + this.getPathCost()).compareTo(Integer.valueOf(node.heuristicH1() + node.getPathCost()));
+                n = Integer.valueOf(this.heuristicH1() + this.getPathCost())
+                        .compareTo(Integer.valueOf(node.heuristicH1() + node.getPathCost()));
                 break;
             case "h2":
-                n = Integer.valueOf(this.heuristicH2() + this.getPathCost()).compareTo(Integer.valueOf(node.heuristicH2() + node.getPathCost()));
+                n = Integer.valueOf(this.heuristicH2() + this.getPathCost())
+                        .compareTo(Integer.valueOf(node.heuristicH2() + node.getPathCost()));
                 break;
             default: // no heuristic
                 n = 0;
