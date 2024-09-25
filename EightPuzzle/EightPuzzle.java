@@ -156,6 +156,18 @@ public class EightPuzzle {
         }
     }
 
+    private int heuristic(Node node, String heuristic) {
+        switch (heuristic) {
+            case "h1":
+                return new Node(puzzleState).heuristicH1();
+            case "h2":
+                return new Node(puzzleState).heuristicH2();
+            default:
+                break;
+        }
+        return 0;
+    }
+
     private void printSolution(Node currentNode, int nodesCreated) {
         System.out.println("Nodes created during search: " + nodesCreated);
         System.out.println("Solution length: " + currentNode.getPathCost());
@@ -242,18 +254,6 @@ public class EightPuzzle {
         return false;
     }
 
-    private int heuristic(Node node, String heuristic) {
-        switch (heuristic) {
-            case "h1":
-                return new Node(puzzleState).heuristicH1();
-            case "h2":
-                return new Node(puzzleState).heuristicH2();
-            default:
-                break;
-        }
-        return 0;
-    }
-
     private boolean solveAStar(String maxNodes, String heuristic) {
         // BFS priority queue with heuristic
         int nodesCreated = 0;
@@ -277,15 +277,12 @@ public class EightPuzzle {
                     frontier.add(child);
                     nodesCreated++;
                 } else if (frontier.contains(child)) {
-                    for (Node node : frontier) {
-                        // update entry in frontier if a cheaper path is found
-                        if (node.equals(child) && (child.getPathCost()
-                                + heuristic(child, heuristic)) < (node.getPathCost() + heuristic(node, heuristic))) {
+                    frontier.forEach(node -> {
+                        if (node.equals(child) && child.getTotalCost() < node.getTotalCost()) {
                             frontier.remove(node);
                             frontier.add(child);
-                            break;
                         }
-                    }
+                    });
                 }
             }
         }

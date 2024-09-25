@@ -42,21 +42,10 @@ public class Node implements Comparable<Node> {
         }
     }
 
+    @Override
     public int compareTo(Node node) {
         int n;
-        // calculate g(n) + h(n)
-        switch (heuristic) {
-            case "h1":
-                n = Integer.valueOf(this.heuristicH1() + this.getPathCost())
-                        .compareTo(Integer.valueOf(node.heuristicH1() + node.getPathCost()));
-                break;
-            case "h2":
-                n = Integer.valueOf(this.heuristicH2() + this.getPathCost())
-                        .compareTo(Integer.valueOf(node.heuristicH2() + node.getPathCost()));
-                break;
-            default: // no heuristic
-                n = 0;
-        }
+        n = Integer.valueOf(this.getTotalCost()).compareTo(Integer.valueOf(node.getTotalCost()));
         if (n == 0)
             n = this.moves.getLast().compareTo(node.moves.getLast());
         return n;
@@ -76,6 +65,21 @@ public class Node implements Comparable<Node> {
 
     public int getPathCost() {
         return this.moves.size();
+    }
+
+    public int getHeuristicCost() {
+        switch (heuristic) {
+            case "h1":
+                return heuristicH1();
+            case "h2":
+                return heuristicH2();
+            default:
+                return 0;
+        }
+    }
+
+    public int getTotalCost() {
+        return this.getPathCost() + this.getHeuristicCost(); // f(n) = g(n) + h(n)
     }
 
     public List<Node> expand(EightPuzzle puzzle) {
