@@ -63,10 +63,12 @@ public class Node implements Comparable<Node> {
         return new ArrayList<>(moves);
     }
 
+    // g(n)
     public int getPathCost() {
         return this.moves.size();
     }
 
+    // h(n)
     public int getHeuristicCost() {
         switch (heuristic) {
             case "h1":
@@ -78,6 +80,7 @@ public class Node implements Comparable<Node> {
         }
     }
 
+    // f(n)
     public int getTotalCost() {
         return this.getPathCost() + this.getHeuristicCost(); // f(n) = g(n) + h(n)
     }
@@ -124,7 +127,7 @@ public class Node implements Comparable<Node> {
         for (int i = 1; i < 9; i++) {
             int tileIndex = state.indexOf(i);
             // manhattan distance
-            totalDistance = totalDistance + Math.abs((tileIndex % 3) - (i % 3)) + Math.abs((tileIndex / 3) - (i / 3));
+            totalDistance += Math.abs((tileIndex % 3) - (i % 3)) + Math.abs((tileIndex / 3) - (i / 3));
         }
         return totalDistance;
     }

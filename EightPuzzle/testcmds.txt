@@ -45,7 +45,9 @@ solve A* h1
 # reset to last scrambled state to compare heuristic solution lengths
 scrambleState 10
 solve A* h2
-# test repeated state checking
+# as you can see neither heuristic overestimated the solution cost
+# and h1 created more nodes than h2
+# test repeated state checking with a state that would loop
 # setState 1 2 3 4 5 6 7 8 0
 # solve DFS maxnodes=1000000
 // done (test other comment)

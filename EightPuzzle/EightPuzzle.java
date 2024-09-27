@@ -80,6 +80,40 @@ public class EightPuzzle {
         return puzzleState.stream().map(Integer::valueOf).toList();
     }
 
+    public static double estimateNumberNodes(int depth, double branchingFactor) {
+        // formula N + 1 = 1 + b + b^2 + ... + b^d
+        // simplify with geometric series to (1-b^(d+1))/(1-b)
+        double nodesEstimated = 0.0;
+        if (branchingFactor == 1.0) {
+            nodesEstimated = depth + 1; // make low guess
+        } else {
+            nodesEstimated = (1 - Math.pow(branchingFactor, depth + 1)) / (1 - branchingFactor);
+        }
+        return nodesEstimated - 1;
+    }
+
+    public static double effectiveBranchingFactor(int nodesGenerated, int depth) {
+        // pseudo code from
+        // http://ozark.hendrix.edu/~ferrer/courses/335/f11/lectures/effective-branching.html
+        double lowEstimate = 1.0;
+        double highEstimate = Math.pow(nodesGenerated, 1.0 / depth);
+        double tolerance = 0.01;
+        double b = highEstimate + lowEstimate / 2.0;
+        double delta = 0.0;
+        delta = estimateNumberNodes(depth, b) - nodesGenerated;
+        // binary search for b* until the estimation for N is close to the actual number
+        while (Math.abs(delta) > tolerance) {
+            if (delta > 0) {
+                highEstimate = b;
+            } else {
+                lowEstimate = b;
+            }
+            b = (highEstimate + lowEstimate) / 2.0;
+            delta = estimateNumberNodes(depth, b) - nodesGenerated;
+        }
+        return b;
+    }
+
     private boolean setState(String state) {
         String[] values = state.split(" ");
         Set<Integer> uniqueValues = new HashSet<Integer>();
